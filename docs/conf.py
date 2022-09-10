@@ -23,4 +23,4 @@ html_logo = "_static/logo.png"
 html_title = "Sphinx Social Previews"
 
 
-ogp_site_url = "https://sphinx-social-preview.readthedocs.io/en/latest"
+ogp_site_url = "https://sphinx-social-previews.readthedocs.io/en/latest"

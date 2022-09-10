@@ -37,8 +37,8 @@ def render_page_card(app, pagename, templatename, context, doctree):
     fig.savefig(static_dir / path_out)
     
     # Link the image in our page metadata
-    n_depth = len(pagename.split("/")) - 1
-    path_out_image = f"{'../' * n_depth}_static/images/social_previews/{path_out}"
+    url = app.config.ogp_site_url.strip("/")
+    path_out_image = f"{url}/_static/images/social_previews/{path_out}"
     context[
         "metatags"
     ] += f'\n    <meta property="og:image" content="{path_out_image}" />'
