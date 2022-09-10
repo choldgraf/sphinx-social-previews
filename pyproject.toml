@@ -1,0 +1,67 @@
+[build-system]
+requires = ["flit_core >=3.5,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "sphinx-social-previews"
+authors = [{name = "Executable Book Project", email = "executablebooks@gmail.com"}]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Text Processing :: Markup",
+]
+keywords = [
+    "documentation",
+]
+dynamic = ["description", "version"]
+requires-python = ">=3.7"
+dependencies = [
+    "sphinx>=3",
+    "matplotlib",
+]
+
+[project.license]
+file = "LICENSE"
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.urls]
+Homepage = "https://executablebooks.org/"
+Documentation = "https://executablebooks.org"
+Funding = "https://executablebooks.org"
+Source = "https://github.com/executablebooks/sphinx-social-previews/"
+Tracker = "https://github.com/executablebooks/sphinx-social-previews/issues"
+
+[project.optional-dependencies]
+code_style = ["pre-commit~=2.12"]
+sphinx = [
+    "myst-parser",
+    "sphinx-book-theme",
+]
+
+[tool.flit.module]
+name = "sphinx_social_previews"
+
+[tool.flit.sdist]
+exclude = [
+  ".*",  # Any hidden folders or files
+  "docs/",
+  "tests/",
+  "scripts/",
+  "tox.ini",
+  "codecov.yml",
+  "conftest.py",
+]
+
+[tool.isort]
+profile = "black"
