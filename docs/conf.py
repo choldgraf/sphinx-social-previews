@@ -6,7 +6,7 @@ author = "Executable Books Project"
 
 
 # -- General configuration ---------------------------------------------------
-extensions = ["sphinx_social_previews", "myst_parser"]
+extensions = ["sphinxext.opengraph", "sphinx_social_previews", "myst_parser"]
 templates_path = []
 source_suffix = ".rst"
 main_doc = "index"
@@ -21,3 +21,6 @@ html_theme = "sphinx_book_theme"
 html_static_path = ["_static"]
 html_logo = "_static/logo.png"
 html_title = "Sphinx Social Previews"
+
+
+ogp_site_url = "https://sphinx-social-preview.readthedocs.io/en/latest"
