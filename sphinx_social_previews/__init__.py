@@ -41,7 +41,10 @@ def render_page_card(app, pagename, templatename, context, doctree):
     path_out_image = f"{url}/_static/images/social_previews/{path_out}"
     context[
         "metatags"
-    ] += f'\n    <meta property="og:image" content="{path_out_image}" />'
+    ] += f'<meta property="og:image" content="{path_out_image}" />'
+    context[
+        "metatags"
+    ] += f'<meta name="twitter:card" content="summary_large_image" />'
 
 
 def create_social_card(site_title, page_title, tagline, image=None, text_color="#7e7e7e", background_color="white", font="Roboto"):
