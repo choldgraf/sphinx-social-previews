@@ -86,8 +86,16 @@ def create_social_card_objects(
     line_color="#5A626B",
     font="Roboto",
 ):
+    # Load font if it's not in our list
+    import matplotlib as mpl
+
+    path_font = Path(__file__).parent / "_static/Roboto-flex.ttf"
+    font = mpl.font_manager.FontEntry(fname=str(path_font), name="Roboto")
+    mpl.font_manager.fontManager.ttflist.append(font)
+
     # Size of figure
     ratio = 1200 / 628
+
     # Because Matplotlib doesn't let you specify figures in pixels, only inches
     multiple = 3
     fig = plt.figure(figsize=(ratio * multiple, multiple))
@@ -111,7 +119,7 @@ def create_social_card_objects(
 
     # Axes configuration
     left_margin = 0.05
-    with plt.rc_context({"font.sans-serif": [font], "text.color": text_color}):
+    with plt.rc_context({"font.family": font.name, "text.color": text_color}):
         # Site title
         # Smaller font, just above page title
         site_title_y_offset = 0.87
