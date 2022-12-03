@@ -257,9 +257,14 @@ def render_page_card(app, pagename, templatename, context, doctree):
     url = app.config.ogp_site_url.strip("/")
     path_out_image = f"{url}/{path_images}/{path_out}"
     metatags = context["metatags"].split("\n")
+    found_image = False
     for ii, tag in enumerate(metatags):
         if "og:image" in tag:
             metatags[ii] = f'<meta property="og:image" content="{path_out_image}" />'
+            found_image = True
             break
+    if found_image is False:
+        # If we didn't find an image, we'll add one now
+        metatags.append(f'<meta property="og:image" content="{path_out_image}" />')
     metatags.append('<meta name="twitter:card" content="summary_large_image" />')
     context["metatags"] = "\n".join(metatags)
