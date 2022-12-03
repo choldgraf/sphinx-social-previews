@@ -6,4 +6,3 @@ A lightweight Sphinx extension to generate social media card preview images usin
 >
 > I hope to upstream this functionality into the [sphinxext-opengraph extension](https://github.com/wpilibsuite/sphinxext-opengraph).
 > I'm using this repository to demonstrate and let people try it out.
-

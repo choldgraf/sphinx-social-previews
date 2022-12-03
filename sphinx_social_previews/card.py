@@ -14,7 +14,7 @@ MAX_CHAR_PAGETITLE = 65
 MAX_CHAR_DESCRIPTION = 155
 
 DEFAULT_CONFIG = {
-  "enable": True,
+    "enable": True,
 }
 
 
@@ -30,10 +30,10 @@ def _set_description_line_width():
 
 def setup_social_card_images(app):
     """Create matplotlib objects for saving social preview cards.
-    
+
     This plots the final objects that are consistent across all pages.
     For example, site logo, shadow logo, line at the bottom.
-    
+
     It plots placeholder text for text values because they change on each page.
     """
     config_social = DEFAULT_CONFIG.copy()
@@ -49,27 +49,33 @@ def setup_social_card_images(app):
     if config_social.get("image"):
         kwargs["image"] = Path(app.builder.srcdir) / config_social.get("image")
     elif app.config.html_logo:
-        kwargs["image"] = Path(app.builder.srcdir) / app.config.html_logo 
+        kwargs["image"] = Path(app.builder.srcdir) / app.config.html_logo
 
     # Grab the image shadow PNG for plotting
     if config_social.get("image_shadow"):
-        kwargs["image_shadow"] = Path(app.builder.srcdir) / config_social.get("image_shadow")
+        kwargs["image_shadow"] = Path(app.builder.srcdir) / config_social.get(
+            "image_shadow"
+        )
     else:
         kwargs["image_shadow"] = Path(__file__).parent / "_static/logo-shadow.png"
 
-    pass_through_config = ["text_color",
-    "line_color",
-    "background_color",
-    "font"
-    ]
+    pass_through_config = ["text_color", "line_color", "background_color", "font"]
     for config in pass_through_config:
         if config_social.get(config):
             kwargs[config] = config_social.get(config)
-    
+
     # Create the figure objects with placeholder text
     # Store in the Sphinx environment for re-use later
-    fig, txt_site, txt_page, txt_description, txt_url = create_social_card_objects(**kwargs)
-    app.env.social_card_plot_objects = [fig, txt_site, txt_page, txt_description, txt_url]
+    fig, txt_site, txt_page, txt_description, txt_url = create_social_card_objects(
+        **kwargs
+    )
+    app.env.social_card_plot_objects = [
+        fig,
+        txt_site,
+        txt_page,
+        txt_description,
+        txt_url,
+    ]
 
 
 def create_social_card_objects(
@@ -91,17 +97,17 @@ def create_social_card_objects(
     axtext = fig.add_axes((0, 0, 1, 1))
 
     # Image axis
-    ax_x, ax_y, ax_w, ax_h = (0.68, 0.64, 0.25, 0.25) 
+    ax_x, ax_y, ax_w, ax_h = (0.68, 0.64, 0.25, 0.25)
     axim_logo = fig.add_axes((ax_x, ax_y, ax_w, ax_h), anchor="NE")
     axim_logo.set_axis_off()
 
     # Image shadow axis
-    ax_x, ax_y, ax_w, ax_h = (0.82, 0.10, 0.1, 0.1) 
+    ax_x, ax_y, ax_w, ax_h = (0.82, 0.10, 0.1, 0.1)
     axim_shadow = fig.add_axes((ax_x, ax_y, ax_w, ax_h), anchor="NE")
     axim_shadow.set_axis_off()
 
     # Line at the bottom axis
-    axline = fig.add_axes((-.1, -.03, 1.2, .1))
+    axline = fig.add_axes((-0.1, -0.03, 1.2, 0.1))
 
     # Axes configuration
     left_margin = 0.05
@@ -191,17 +197,27 @@ def render_page_card(app, pagename, templatename, context, doctree):
 
     # Grab the card creation objects from Sphinx environment
     # We just update them in order to save time
-    fig, txt_sitetitle, txt_pagetitle, txt_description, txt_url = app.env.social_card_plot_objects
-    
+    (
+        fig,
+        txt_sitetitle,
+        txt_pagetitle,
+        txt_description,
+        txt_url,
+    ) = app.env.social_card_plot_objects
+
     # Tags contains the OGP metadata for this page
     tags = get_tags(app, context, doctree, app.config)
 
     def parse_ogp_tag(tags, entry):
-        return tags.split(entry)[-1].split("content=")[1].split('/>')[0].strip().strip('"')
-    
+        return (
+            tags.split(entry)[-1].split("content=")[1].split("/>")[0].strip().strip('"')
+        )
+
     # Description is the first few sentences of the page
     description = parse_ogp_tag(tags, "og:description")
-    description_max_length = config_social.get("description_max_length", MAX_CHAR_DESCRIPTION - 3)
+    description_max_length = config_social.get(
+        "description_max_length", MAX_CHAR_DESCRIPTION - 3
+    )
     if len(description) > description_max_length:
         description = description[:description_max_length].strip() + "..."
 
@@ -239,8 +255,8 @@ def render_page_card(app, pagename, templatename, context, doctree):
     path_out_image = f"{url}/{path_images}/{path_out}"
     metatags = context["metatags"].split("\n")
     for ii, tag in enumerate(metatags):
-        if 'og:image' in tag:
+        if "og:image" in tag:
             metatags[ii] = f'<meta property="og:image" content="{path_out_image}" />'
             break
     metatags.append('<meta name="twitter:card" content="summary_large_image" />')
-    context["metatags"] = "\n".join(metatags)        
+    context["metatags"] = "\n".join(metatags)
