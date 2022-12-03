@@ -1,6 +1,10 @@
 name: tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
 
 jobs:
 
@@ -45,4 +49,4 @@ jobs:
     - name: Build docs
       run: |
         cd docs
-        make html -W
+        sphinx-build . _build/html -W
