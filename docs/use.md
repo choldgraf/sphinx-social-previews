@@ -1,10 +1,12 @@
 # User guide
 
+This section covers how to install and use `sphinx-social-previews`.
+
 ## Install and enable the extension
 
 First, install the extension:
 
-```
+```shell
 pip install git+https://github.com/choldgraf/sphinx-social-previews
 ```
 

@@ -21,12 +21,14 @@ DEFAULT_CONFIG = {
 
 # These functions are used when creating social card objects to set MPL values.
 # They must be defined here otherwise Sphinx errors when trying to pickle them.
+# They are dependent on the `multiple` variable defined when the figure is created.
+# Because they are depending on the figure size and renderer used to generate them.
 def _set_pagetitle_line_width():
-    return 390
+    return 650
 
 
 def _set_description_line_width():
-    return 470
+    return 940
 
 
 def setup_social_card_images(app):
@@ -87,18 +89,20 @@ def create_social_card_objects(
     line_color="#5A626B",
     font="Roboto",
 ):
-    # Load font if it's not in our list
-    import matplotlib as mpl
-
+    # Load the Roboto font
+    # TODO: Currently the `font` parameter above does nothing
+    #   Should instead make it possible to load remote fonts or local fonts
+    #   if a user specifies.
     path_font = Path(__file__).parent / "_static/Roboto-flex.ttf"
-    font = mpl.font_manager.FontEntry(fname=str(path_font), name="Roboto")
-    mpl.font_manager.fontManager.ttflist.append(font)
-
-    # Size of figure
-    ratio = 1200 / 628
+    font = matplotlib.font_manager.FontEntry(fname=str(path_font), name="Roboto")
+    matplotlib.font_manager.fontManager.ttflist.append(font)
 
     # Because Matplotlib doesn't let you specify figures in pixels, only inches
-    multiple = 3
+    # This `multiple` results in a scale of about 1146px by 600px
+    # Which is roughly the recommended size for OpenGraph images
+    # ref: https://opengraph.xyz
+    ratio = 1200 / 628
+    multiple = 6
     fig = plt.figure(figsize=(ratio * multiple, multiple))
     fig.set_facecolor(background_color)
 
@@ -106,30 +110,28 @@ def create_social_card_objects(
     axtext = fig.add_axes((0, 0, 1, 1))
 
     # Image axis
-    ax_x, ax_y, ax_w, ax_h = (0.68, 0.64, 0.25, 0.25)
+    ax_x, ax_y, ax_w, ax_h = (0.69, 0.7, 0.25, 0.25)
     axim_logo = fig.add_axes((ax_x, ax_y, ax_w, ax_h), anchor="NE")
-    axim_logo.set_axis_off()
 
     # Image shadow axis
-    ax_x, ax_y, ax_w, ax_h = (0.82, 0.10, 0.1, 0.1)
+    ax_x, ax_y, ax_w, ax_h = (0.82, 0.1, 0.1, 0.1)
     axim_shadow = fig.add_axes((ax_x, ax_y, ax_w, ax_h), anchor="NE")
-    axim_shadow.set_axis_off()
 
     # Line at the bottom axis
-    axline = fig.add_axes((-0.1, -0.03, 1.2, 0.1))
+    axline = fig.add_axes((-0.1, -0.04, 1.2, 0.1))
 
     # Axes configuration
     left_margin = 0.05
     with plt.rc_context({"font.family": font.name, "text.color": text_color}):
         # Site title
         # Smaller font, just above page title
-        site_title_y_offset = 0.87
+        site_title_y_offset = 0.9
         txt_site = axtext.text(
             left_margin,
             site_title_y_offset,
             "Test site title",
             {
-                "size": 14,
+                "size": 26,
             },
             ha="left",
             va="top",
@@ -138,13 +140,13 @@ def create_social_card_objects(
 
         # Page title
         # A larger font for more visibility
-        page_title_y_offset = 0.75
+        page_title_y_offset = 0.8
 
         txt_page = axtext.text(
             left_margin,
             page_title_y_offset,
             "Test page title, a bit longer to demo",
-            {"size": 22, "color": "k"},
+            {"size": 44, "color": "k"},
             ha="left",
             va="top",
             wrap=True,
@@ -154,6 +156,8 @@ def create_social_card_objects(
 
         # description
         # Just below site title, smallest font and many lines.
+        # Our target length is 160 characters, so it should be
+        # two lines at full width with some room to spare at this length.
         description_y_offset = 0.22
         txt_description = axtext.text(
             left_margin,
@@ -162,7 +166,7 @@ def create_social_card_objects(
                 "A longer description that we use to ,"
                 "show off what the descriptions look like."
             ),
-            {"size": 11},
+            {"size": 18},
             ha="left",
             va="bottom",
             wrap=True,
@@ -176,7 +180,7 @@ def create_social_card_objects(
             left_margin,
             url_y_axis_ofset,
             "testurl.org",
-            {"size": 11},
+            {"size": 22},
             ha="left",
             va="bottom",
             fontweight="bold",
@@ -190,11 +194,13 @@ def create_social_card_objects(
     if image:
         img = mpimg.imread(image)
         axim_logo.imshow(img)
-        axim_logo.set_axis_off()
 
     # Put a colored line at the bottom of the figure
-    axline.set_axis_off()
-    axline.hlines(0, 0, 1, lw=8, color=line_color)
+    axline.hlines(0, 0, 1, lw=16, color=line_color)
+
+    # Remove the ticks and borders from all axes for a clean look
+    for ax in fig.axes:
+        ax.set_axis_off()
     return fig, txt_site, txt_page, txt_description, txt_url
 
 
@@ -260,7 +266,9 @@ def render_page_card(app, pagename, templatename, context, doctree):
     static_dir = Path(app.builder.outdir) / path_images
     static_dir.mkdir(exist_ok=True, parents=True)
     path_out = f"summary_{pagename.replace('/', '_')}.png"
-    fig.savefig(static_dir / path_out)
+
+    # Save the figure
+    fig.savefig(static_dir / path_out, facecolor=None)
 
     # Link the image in our page metadata
     url = app.config.ogp_site_url.strip("/")
@@ -269,15 +277,23 @@ def render_page_card(app, pagename, templatename, context, doctree):
     # ref: https://developer.twitter.com/en/docs/twitter-for-websites/cards/guides/troubleshooting-cards#refreshing_images  # noqa
     hash = hashlib.sha1((sitetitle + pagetitle + description).encode()).hexdigest()
     path_out_image = f"{url}/{path_images}/{path_out}?{hash}"
+
+    # Turn metatags into a list so we can easily add/remove
     metatags = context["metatags"].split("\n")
-    found_image = False
-    for ii, tag in enumerate(metatags):
-        if "og:image" in tag:
-            metatags[ii] = f'<meta property="og:image" content="{path_out_image}" />'
-            found_image = True
-            break
-    if found_image is False:
-        # If we didn't find an image, we'll add one now
-        metatags.append(f'<meta property="og:image" content="{path_out_image}" />')
+
+    # Find any og:image metadata tags and remove them
+    # because we'll over-ride with this card
+    og_image_lines = [ii for ii, tag in enumerate(metatags) if 'og:image"' in tag]
+    for ii in og_image_lines[::-1]:
+        metatags.pop(ii)
+
+    # OpenGraph image tags
+    metatags.append(f'<meta property="og:image" content="{path_out_image}" />')
+    metatags.append('<meta property="og:image:width" content="1146" />')
+    metatags.append('<meta property="og:image:height" content="600" />')
+
+    # Twitter-specific tags
     metatags.append('<meta name="twitter:card" content="summary_large_image" />')
+
+    # Overwrite metatags with our new version
     context["metatags"] = "\n".join(metatags)
