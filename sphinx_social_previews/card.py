@@ -1,3 +1,4 @@
+import hashlib
 from pathlib import Path
 import matplotlib
 from matplotlib import pyplot as plt
@@ -263,7 +264,10 @@ def render_page_card(app, pagename, templatename, context, doctree):
 
     # Link the image in our page metadata
     url = app.config.ogp_site_url.strip("/")
-    path_out_image = f"{url}/{path_images}/{path_out}"
+
+    # Add a hash to the image based on metadata to bust caches
+    hash = hashlib.sha1((sitetitle + pagetitle + description).encode()).hexdigest()
+    path_out_image = f"{url}/{path_images}/{path_out}?{hash}"
     metatags = context["metatags"].split("\n")
     found_image = False
     for ii, tag in enumerate(metatags):
