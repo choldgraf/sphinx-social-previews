@@ -266,6 +266,7 @@ def render_page_card(app, pagename, templatename, context, doctree):
     url = app.config.ogp_site_url.strip("/")
 
     # Add a hash to the image based on metadata to bust caches
+    # ref: https://developer.twitter.com/en/docs/twitter-for-websites/cards/guides/troubleshooting-cards#refreshing_images  # noqa
     hash = hashlib.sha1((sitetitle + pagetitle + description).encode()).hexdigest()
     path_out_image = f"{url}/{path_images}/{path_out}?{hash}"
     metatags = context["metatags"].split("\n")
