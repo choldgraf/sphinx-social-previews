@@ -146,7 +146,7 @@ def create_social_card_objects(
             left_margin,
             page_title_y_offset,
             "Test page title, a bit longer to demo",
-            {"size": 42, "color": "k"},
+            {"size": 43, "color": "k"},
             ha="left",
             va="top",
             wrap=True,
@@ -166,7 +166,7 @@ def create_social_card_objects(
                 "A longer description that we use to ,"
                 "show off what the descriptions look like."
             ),
-            {"size": 18},
+            {"size": 16},
             ha="left",
             va="bottom",
             wrap=True,
