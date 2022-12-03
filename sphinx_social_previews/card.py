@@ -149,7 +149,10 @@ def create_social_card_objects(
         txt_description = axtext.text(
             left_margin,
             description_y_offset,
-            "A longer description that we use to show off what the descriptions look like.",
+            (
+                "A longer description that we use to ,"
+                "show off what the descriptions look like."
+            ),
             {"size": 11},
             ha="left",
             va="bottom",
