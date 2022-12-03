@@ -6,7 +6,7 @@ author = "Executable Books Project"
 
 
 # -- General configuration ---------------------------------------------------
-extensions = ["sphinxext.opengraph", "sphinx_social_previews", "myst_parser"]
+extensions = ["sphinx_social_previews", "sphinxext.opengraph", "myst_parser"]
 templates_path = []
 source_suffix = ".rst"
 main_doc = "index"
