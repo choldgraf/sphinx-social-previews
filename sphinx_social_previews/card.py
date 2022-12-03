@@ -24,11 +24,11 @@ DEFAULT_CONFIG = {
 # They are dependent on the `multiple` variable defined when the figure is created.
 # Because they are depending on the figure size and renderer used to generate them.
 def _set_pagetitle_line_width():
-    return 650
+    return 850
 
 
 def _set_description_line_width():
-    return 940
+    return 1000
 
 
 def setup_social_card_images(app):
@@ -146,7 +146,7 @@ def create_social_card_objects(
             left_margin,
             page_title_y_offset,
             "Test page title, a bit longer to demo",
-            {"size": 44, "color": "k"},
+            {"size": 42, "color": "k"},
             ha="left",
             va="top",
             wrap=True,
