@@ -1,3 +1,4 @@
+import hashlib
 from pathlib import Path
 import matplotlib
 from matplotlib import pyplot as plt
@@ -86,8 +87,16 @@ def create_social_card_objects(
     line_color="#5A626B",
     font="Roboto",
 ):
+    # Load font if it's not in our list
+    import matplotlib as mpl
+
+    path_font = Path(__file__).parent / "_static/Roboto-flex.ttf"
+    font = mpl.font_manager.FontEntry(fname=str(path_font), name="Roboto")
+    mpl.font_manager.fontManager.ttflist.append(font)
+
     # Size of figure
     ratio = 1200 / 628
+
     # Because Matplotlib doesn't let you specify figures in pixels, only inches
     multiple = 3
     fig = plt.figure(figsize=(ratio * multiple, multiple))
@@ -111,7 +120,7 @@ def create_social_card_objects(
 
     # Axes configuration
     left_margin = 0.05
-    with plt.rc_context({"font.sans-serif": [font], "text.color": text_color}):
+    with plt.rc_context({"font.family": font.name, "text.color": text_color}):
         # Site title
         # Smaller font, just above page title
         site_title_y_offset = 0.87
@@ -255,7 +264,11 @@ def render_page_card(app, pagename, templatename, context, doctree):
 
     # Link the image in our page metadata
     url = app.config.ogp_site_url.strip("/")
-    path_out_image = f"{url}/{path_images}/{path_out}"
+
+    # Add a hash to the image based on metadata to bust caches
+    # ref: https://developer.twitter.com/en/docs/twitter-for-websites/cards/guides/troubleshooting-cards#refreshing_images  # noqa
+    hash = hashlib.sha1((sitetitle + pagetitle + description).encode()).hexdigest()
+    path_out_image = f"{url}/{path_images}/{path_out}?{hash}"
     metatags = context["metatags"].split("\n")
     found_image = False
     for ii, tag in enumerate(metatags):
