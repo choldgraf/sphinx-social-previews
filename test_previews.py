@@ -15,7 +15,7 @@ fig, txtsite, txtpage, txtdesc, txturl = create_social_card_objects(
 
 # These are roughly the max characters we enforce
 # Leaving here for texting
-MAX_CHAR_PAGETITLE = 65
+MAX_CHAR_PAGETITLE = 75
 MAX_CHAR_DESCRIPTION = 160
 
 txtsite.set_text("Chris Holdgraf's website")
