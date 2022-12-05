@@ -19,9 +19,9 @@ MAX_CHAR_PAGETITLE = 65
 MAX_CHAR_DESCRIPTION = 160
 
 txtsite.set_text("Chris Holdgraf's website")
-title = ("AAAA " * (MAX_CHAR_PAGETITLE // 5)) + "..."
+title = ("AAAAA " * (MAX_CHAR_PAGETITLE // 6)) + "..."
 txtpage.set_text(title)
-desc = ("BBBB " * (MAX_CHAR_DESCRIPTION // 5)) + "..."
+desc = ("BBBBB " * (MAX_CHAR_DESCRIPTION // 6)) + "..."
 txtdesc.set_text(desc)
 txturl.set_text("chrisholdgraf.com")
 fig.savefig("./tmp.png", facecolor="w")
