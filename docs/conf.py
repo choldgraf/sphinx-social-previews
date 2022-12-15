@@ -24,5 +24,5 @@ html_title = "Sphinx Social Previews"
 
 ogp_site_url = "https://sphinx-social-previews.readthedocs.io/en/latest"
 ogp_social_previews = {
-    # "image_shadow": "_static/logo.png",
+    # "image_mini": "_static/logo.png",
 }

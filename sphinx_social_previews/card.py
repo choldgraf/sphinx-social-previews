@@ -12,7 +12,7 @@ matplotlib.use("agg")
 LOGGER = logging.getLogger(__name__)
 HERE = Path(__file__).parent
 MAX_CHAR_PAGETITLE = 75
-MAX_CHAR_DESCRIPTION = 155
+MAX_CHAR_DESCRIPTION = 175
 
 DEFAULT_CONFIG = {
     "enable": True,
@@ -24,7 +24,7 @@ DEFAULT_CONFIG = {
 # They are dependent on the `multiple` variable defined when the figure is created.
 # Because they are depending on the figure size and renderer used to generate them.
 def _set_pagetitle_line_width():
-    return 800
+    return 825
 
 
 def _set_description_line_width():
@@ -35,7 +35,7 @@ def setup_social_card_images(app):
     """Create matplotlib objects for saving social preview cards.
 
     This plots the final objects that are consistent across all pages.
-    For example, site logo, shadow logo, line at the bottom.
+    For example, site logo, mini logo, line at the bottom.
 
     It plots placeholder text for text values because they change on each page.
     """
@@ -55,15 +55,15 @@ def setup_social_card_images(app):
     elif app.config.html_logo:
         kwargs["image"] = Path(app.builder.srcdir) / app.config.html_logo
 
-    # Grab the image shadow PNG for plotting
-    if config_social.get("image_shadow"):
-        kwargs["image_shadow"] = Path(app.builder.srcdir) / config_social.get(
-            "image_shadow"
+    # Grab the mini image PNG for plotting
+    if config_social.get("image_mini"):
+        kwargs["image_mini"] = Path(app.builder.srcdir) / config_social.get(
+            "image_mini"
         )
     else:
-        kwargs["image_shadow"] = Path(__file__).parent / "_static/logo-shadow.png"
+        kwargs["image_mini"] = Path(__file__).parent / "_static/logo-mini.png"
 
-    pass_through_config = ["text_color", "line_color", "background_color", "font"]
+    pass_through_config = ["pagetitle_color", "line_color", "background_color", "font"]
     for config in pass_through_config:
         if config_social.get(config):
             kwargs[config] = config_social.get(config)
@@ -84,8 +84,11 @@ def setup_social_card_images(app):
 
 def create_social_card_objects(
     image=None,
-    image_shadow=None,
-    text_color="#4a4a4a",
+    image_mini=None,
+    pagetitle_color="#2f363d",
+    description_color="#585e63",
+    sitetitle_color="#585e63",
+    siteurl_color="#2f363d",
     background_color="white",
     line_color="#5A626B",
     font="Roboto",
@@ -111,46 +114,48 @@ def create_social_card_objects(
     axtext = fig.add_axes((0, 0, 1, 1))
 
     # Image axis
-    ax_x, ax_y, ax_w, ax_h = (0.69, 0.7, 0.25, 0.25)
+    ax_x, ax_y, ax_w, ax_h = (0.65, 0.65, 0.3, 0.3)
     axim_logo = fig.add_axes((ax_x, ax_y, ax_w, ax_h), anchor="NE")
 
-    # Image shadow axis
+    # Image mini axis
     ax_x, ax_y, ax_w, ax_h = (0.82, 0.1, 0.1, 0.1)
-    axim_shadow = fig.add_axes((ax_x, ax_y, ax_w, ax_h), anchor="NE")
+    axim_mini = fig.add_axes((ax_x, ax_y, ax_w, ax_h), anchor="NE")
 
     # Line at the bottom axis
     axline = fig.add_axes((-0.1, -0.04, 1.2, 0.1))
 
     # Axes configuration
     left_margin = 0.05
-    with plt.rc_context({"font.family": font.name, "text.color": text_color}):
+    with plt.rc_context({"font.family": font.name}):
         # Site title
         # Smaller font, just above page title
-        site_title_y_offset = 0.9
+        site_title_y_offset = 0.87
         txt_site = axtext.text(
             left_margin,
             site_title_y_offset,
             "Test site title",
             {
-                "size": 26,
+                "size": 24,
             },
             ha="left",
             va="top",
             wrap=True,
+            c=sitetitle_color,
         )
 
         # Page title
         # A larger font for more visibility
-        page_title_y_offset = 0.8
+        page_title_y_offset = 0.77
 
         txt_page = axtext.text(
             left_margin,
             page_title_y_offset,
             "Test page title, a bit longer to demo",
-            {"size": 42, "color": "k", "fontweight": "bold"},
+            {"size": 50, "color": "k", "fontweight": "bold"},
             ha="left",
             va="top",
             wrap=True,
+            c=pagetitle_color,
         )
 
         txt_page._get_wrap_line_width = _set_pagetitle_line_width
@@ -159,7 +164,7 @@ def create_social_card_objects(
         # Just below site title, smallest font and many lines.
         # Our target length is 160 characters, so it should be
         # two lines at full width with some room to spare at this length.
-        description_y_offset = 0.22
+        description_y_offset = 0.2
         txt_description = axtext.text(
             left_margin,
             description_y_offset,
@@ -167,15 +172,16 @@ def create_social_card_objects(
                 "A longer description that we use to ,"
                 "show off what the descriptions look like."
             ),
-            {"size": 16},
+            {"size": 17},
             ha="left",
             va="bottom",
             wrap=True,
+            c=description_color,
         )
         txt_description._get_wrap_line_width = _set_description_line_width
 
         # url
-        # Aligned to the left of the shadow image
+        # Aligned to the left of the mini image
         url_y_axis_ofset = 0.12
         txt_url = axtext.text(
             left_margin,
@@ -185,19 +191,30 @@ def create_social_card_objects(
             ha="left",
             va="bottom",
             fontweight="bold",
+            c=siteurl_color,
         )
 
-    if image_shadow:
-        img = mpimg.imread(image_shadow)
-        axim_shadow.imshow(img)
+    if image_mini:
+        img = mpimg.imread(image_mini)
+        axim_mini.imshow(img)
 
     # Put the logo in the top right if it exists
     if image:
         img = mpimg.imread(image)
-        axim_logo.imshow(img)
+        yw, xw = img.shape[:2]
+
+        # Axis is square and width is longest image axis
+        longest = max([yw, xw])
+        axim_logo.set_xlim([0, longest])
+        axim_logo.set_ylim([longest, 0])
+
+        # Center it on the non-long axis
+        xdiff = (longest - xw) / 2
+        ydiff = (longest - yw) / 2
+        axim_logo.imshow(img, extent=[xdiff, xw + xdiff, yw + ydiff, ydiff])
 
     # Put a colored line at the bottom of the figure
-    axline.hlines(0, 0, 1, lw=16, color=line_color)
+    axline.hlines(0, 0, 1, lw=25, color=line_color)
 
     # Remove the ticks and borders from all axes for a clean look
     for ax in fig.axes:
