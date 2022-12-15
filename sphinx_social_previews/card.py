@@ -11,11 +11,15 @@ matplotlib.use("agg")
 
 LOGGER = logging.getLogger(__name__)
 HERE = Path(__file__).parent
-MAX_CHAR_PAGETITLE = 75
+MAX_CHAR_PAGE_TITLE = 75
 MAX_CHAR_DESCRIPTION = 175
 
 DEFAULT_CONFIG = {
     "enable": True,
+    "site_url": True,
+    "site_title": True,
+    "page_title": True,
+    "description": True,
 }
 
 
@@ -23,7 +27,7 @@ DEFAULT_CONFIG = {
 # They must be defined here otherwise Sphinx errors when trying to pickle them.
 # They are dependent on the `multiple` variable defined when the figure is created.
 # Because they are depending on the figure size and renderer used to generate them.
-def _set_pagetitle_line_width():
+def _set_page_title_line_width():
     return 825
 
 
@@ -65,7 +69,7 @@ def setup_social_card_images(app):
     else:
         kwargs["image_mini"] = Path(__file__).parent / "_static/logo-mini.png"
 
-    pass_through_config = ["pagetitle_color", "line_color", "background_color", "font"]
+    pass_through_config = ["page_title_color", "line_color", "background_color", "font"]
     for config in pass_through_config:
         if config_social.get(config):
             kwargs[config] = config_social.get(config)
@@ -87,10 +91,10 @@ def setup_social_card_images(app):
 def create_social_card_objects(
     image=None,
     image_mini=None,
-    pagetitle_color="#2f363d",
+    page_title_color="#2f363d",
     description_color="#585e63",
-    sitetitle_color="#585e63",
-    siteurl_color="#2f363d",
+    site_title_color="#585e63",
+    site_url_color="#2f363d",
     background_color="white",
     line_color="#5A626B",
     font="Roboto",
@@ -142,7 +146,7 @@ def create_social_card_objects(
             ha="left",
             va="top",
             wrap=True,
-            c=sitetitle_color,
+            c=site_title_color,
         )
 
         # Page title
@@ -157,10 +161,10 @@ def create_social_card_objects(
             ha="left",
             va="top",
             wrap=True,
-            c=pagetitle_color,
+            c=page_title_color,
         )
 
-        txt_page._get_wrap_line_width = _set_pagetitle_line_width
+        txt_page._get_wrap_line_width = _set_page_title_line_width
 
         # description
         # Just below site title, smallest font and many lines.
@@ -193,7 +197,7 @@ def create_social_card_objects(
             ha="left",
             va="bottom",
             fontweight="bold",
-            c=siteurl_color,
+            c=site_url_color,
         )
 
     if image_mini:
@@ -237,8 +241,8 @@ def render_page_card(app, pagename, templatename, context, doctree):
     # We just update them in order to save time
     (
         fig,
-        txt_sitetitle,
-        txt_pagetitle,
+        txt_site_title,
+        txt_page_title,
         txt_description,
         txt_url,
     ) = app.env.social_card_plot_objects
@@ -251,35 +255,49 @@ def render_page_card(app, pagename, templatename, context, doctree):
             tags.split(entry)[-1].split("content=")[1].split("/>")[0].strip().strip('"')
         )
 
-    # Description is the first few sentences of the page
-    description = parse_ogp_tag(tags, "og:description")
-    description_max_length = config_social.get(
-        "description_max_length", MAX_CHAR_DESCRIPTION - 3
-    )
+    # If True, we infer from the OGP description
+    # If False, it is an empty string
+    # Else we assume it is a hard-coded string.
+    description = config_social.get("description")
+    if description is True:
+        description = parse_ogp_tag(tags, "og:description")
+        description_max_length = config_social.get(
+            "description_max_length", MAX_CHAR_DESCRIPTION - 3
+        )
+    elif description is False:
+        description = ""
     if len(description) > description_max_length:
         description = description[:description_max_length].strip() + "..."
 
     # Append the site URL to the description if requested
     # Description is the first few sentences of the page
-    site_url = config_social.get("add_site_url", True)
+    site_url = config_social.get("site_url")
     if site_url is True:
-        url_text = app.config.ogp_site_url.split("://")[-1]
-    elif isinstance(site_url, str):
-        url_text = site_url
+        site_url = app.config.ogp_site_url.split("://")[-1]
+    elif site_url is False:
+        site_url = ""
 
     # Page title is taken from the document
-    pagetitle = parse_ogp_tag(tags, "og:title")
-    if len(pagetitle) > MAX_CHAR_PAGETITLE:
-        pagetitle = pagetitle[:MAX_CHAR_PAGETITLE] + "..."
+    page_title = config_social.get("page_title")
+    if page_title is True:
+        page_title = parse_ogp_tag(tags, "og:title")
+    elif page_title is False:
+        page_title = ""
+    if len(page_title) > MAX_CHAR_PAGE_TITLE:
+        page_title = page_title[:MAX_CHAR_PAGE_TITLE] + "..."
 
     # Site title is taken from the Sphinx config
-    sitetitle = context.get("docstitle", "")
+    site_title = config_social.get("site_title")
+    if site_title is True:
+        site_title = site_title = context.get("docstitle", "")
+    elif site_title is False:
+        site_title = ""
 
     # Update the matplotlib text objects with new text from this page
-    txt_sitetitle.set_text(sitetitle)
-    txt_pagetitle.set_text(pagetitle)
+    txt_site_title.set_text(site_title)
+    txt_page_title.set_text(page_title)
     txt_description.set_text(description)
-    txt_url.set_text(url_text)
+    txt_url.set_text(site_url)
 
     # Save the image to a static directory
     path_images = "_images/social_previews"
@@ -295,7 +313,7 @@ def render_page_card(app, pagename, templatename, context, doctree):
 
     # Add a hash to the image based on metadata to bust caches
     # ref: https://developer.twitter.com/en/docs/twitter-for-websites/cards/guides/troubleshooting-cards#refreshing_images  # noqa
-    hash = hashlib.sha1((sitetitle + pagetitle + description).encode()).hexdigest()
+    hash = hashlib.sha1((site_title + page_title + description).encode()).hexdigest()
     path_out_image = f"{url}/{path_images}/{path_out}?{hash}"
 
     # Turn metatags into a list so we can easily add/remove
