@@ -40,7 +40,9 @@ def setup_social_card_images(app):
     It plots placeholder text for text values because they change on each page.
     """
     config_social = DEFAULT_CONFIG.copy()
-    ogp_social_previews = app.config.ogp_social_previews or {}
+    ogp_social_previews = app.config.ogp_social_previews
+    if not ogp_social_previews:
+        ogp_social_previews = {}
     config_social.update(ogp_social_previews)
     app.env.ogp_social_previews_config = config_social
 
