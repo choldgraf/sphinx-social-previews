@@ -114,3 +114,6 @@ node_modules/
 .DS_Store
 
 .idea
+
+# Testing folder
+tmp/

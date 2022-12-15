@@ -24,7 +24,7 @@ DEFAULT_CONFIG = {
 # They are dependent on the `multiple` variable defined when the figure is created.
 # Because they are depending on the figure size and renderer used to generate them.
 def _set_pagetitle_line_width():
-    return 850
+    return 800
 
 
 def _set_description_line_width():

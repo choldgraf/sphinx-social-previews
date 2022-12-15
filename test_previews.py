@@ -6,6 +6,7 @@ I should remove this when I'm happy with the result.
 # %autoreload 2
 
 from sphinx_social_previews.card import create_social_card_objects
+from pathlib import Path
 
 tagline = "This is a tagline, it's a little longer than the rest. " * 5
 fig, txtsite, txtpage, txtdesc, txturl = create_social_card_objects(
@@ -15,16 +16,16 @@ fig, txtsite, txtpage, txtdesc, txturl = create_social_card_objects(
 
 # These are roughly the max characters we enforce
 # Leaving here for texting
-MAX_CHAR_PAGETITLE = 75
+MAX_CHAR_PAGETITLE = 70
 MAX_CHAR_DESCRIPTION = 160
 
-txtsite.set_text("Chris Holdgraf's website")
-title = ("AAAAA " * (MAX_CHAR_PAGETITLE // 6)) + "..."
-txtpage.set_text(title)
-desc = ("BBBBB " * (MAX_CHAR_DESCRIPTION // 6)) + "..."
-txtdesc.set_text(desc)
-txturl.set_text("chrisholdgraf.com")
-fig.savefig("./tmp.png", facecolor="w")
-
-print(len(title))
-print(len(desc))
+for length in [1, 3, 5, 7, 9]:
+    txtsite.set_text("Chris Holdgraf's website")
+    n_words = MAX_CHAR_PAGETITLE // length
+    title = (("A" * length + " ") * n_words) + "..."
+    txtpage.set_text(title)
+    desc = (("B" * length + " ") * n_words * 2) + "..."
+    txtdesc.set_text(desc)
+    txturl.set_text("chrisholdgraf.com")
+    Path("tmp").mkdir(exist_ok=True)
+    fig.savefig(f"./tmp/{length}.png", facecolor="w")
