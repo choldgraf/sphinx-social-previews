@@ -6,6 +6,7 @@ __version__ = "0.0.1"
 
 
 def setup(app):
+    app.setup_extension("sphinxext.opengraph")
     app.connect("builder-inited", setup_social_card_images)
     # Set priority slightly higher so it runs after the opengraph event
     app.connect("html-page-context", render_page_card, priority=501)
