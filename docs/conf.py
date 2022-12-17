@@ -1,3 +1,6 @@
+from subprocess import run
+from pathlib import Path
+
 # -- Project information -----------------------------------------------------
 
 project = "Sphinx Social Previews"
@@ -6,12 +9,12 @@ author = "Executable Books Project"
 
 
 # -- General configuration ---------------------------------------------------
-extensions = ["sphinx_social_previews", "myst_parser"]
+extensions = ["sphinx_social_previews", "myst_parser", "sphinx_design"]
 templates_path = []
 source_suffix = ".rst"
 main_doc = "index"
 language = "en"
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "tmp"]
 pygments_style = "sphinx"
 
 
@@ -26,3 +29,7 @@ ogp_site_url = "https://sphinx-social-previews.readthedocs.io/en/latest"
 ogp_social_previews = {
     # "image_mini": "_static/logo.png",
 }
+
+# Generate example images for documentation
+here = Path(__file__).parent
+run(f"python {here / 'script/test_previews.py'}", shell=True)

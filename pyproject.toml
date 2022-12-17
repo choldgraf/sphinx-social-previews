@@ -46,6 +46,7 @@ Tracker = "https://github.com/executablebooks/sphinx-social-previews/issues"
 [project.optional-dependencies]
 code_style = ["pre-commit"]
 docs = [
+    "sphinx-design",
     "myst-parser",
     "sphinx-book-theme",
 ]

@@ -10,4 +10,5 @@ See the sections below for more information.
 
 ```{toctree}
 use
+examples
 ```
