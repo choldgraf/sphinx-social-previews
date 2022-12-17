@@ -11,7 +11,7 @@ matplotlib.use("agg")
 
 LOGGER = logging.getLogger(__name__)
 HERE = Path(__file__).parent
-MAX_CHAR_PAGE_TITLE = 75
+MAX_CHAR_PAGE_TITLE = 65
 MAX_CHAR_DESCRIPTION = 175
 
 DEFAULT_CONFIG = {
